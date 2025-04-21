@@ -1,6 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/fernandomorato/gator/internal/database"
+	"github.com/google/uuid"
+)
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Args) != 1 {
@@ -8,11 +16,50 @@ func handlerLogin(s *state, cmd command) error {
 	}
 	username := cmd.Args[0]
 
-	err := s.config.SetUser(username)
+	_, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		return fmt.Errorf("user %s doesn't exist: %v", username, err)
+	}
+
+	err = s.config.SetUser(username)
 	if err != nil {
 		return fmt.Errorf("couldn't set user %s: %v", username, err)
 	}
 
 	fmt.Printf("user set to: %s\n", username)
+	return nil
+}
+
+func handlerRegister(s *state, cmd command) error {
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("usage: %s <name>", cmd.Name)
+	}
+	username := cmd.Args[0]
+
+	_, err := s.db.GetUser(context.Background(), username)
+	if err == nil {
+		return fmt.Errorf("user %s already exists", username)
+	} else {
+		log.Printf("while searching for user %s got: %v", username, err)
+		log.Printf("let's create it then")
+	}
+
+	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
+		ID: uuid.New(),
+		Name: username,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+	if err != nil {
+		return fmt.Errorf("error creating user %s: %v", username, err)
+	}
+
+	err = s.config.SetUser(username)
+	if err != nil {
+		return fmt.Errorf("couldn't set user %s: %v", username, err)
+	}
+
+	log.Printf("created user %s successfully!", username)
+	log.Println(user)
 	return nil
 }
