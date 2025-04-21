@@ -127,12 +127,17 @@ func handlerFollowing(s *state, cmd command) error {
 		return fmt.Errorf("usage: cli %s", cmd.Name)
 	}
 
-	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), s.config.CurrentUserName)
+	user, err := s.db.GetUser(context.Background(), s.config.CurrentUserName)
 	if err != nil {
-		return fmt.Errorf("error getting followed fields for user %s: %v", s.config.CurrentUserName, err)
+		return fmt.Errorf("error getting user %s: %v", s.config.CurrentUserName, err)
 	}
 
-	fmt.Printf("user %s is following:\n", s.config.CurrentUserName)
+	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	if err != nil {
+		return fmt.Errorf("error getting followed fields for user %s: %v", user.Name, err)
+	}
+
+	fmt.Printf("user %s is following:\n", user.Name)
 	for _, feedFollow := range feedFollows {
 		fmt.Printf("- %s\n", feedFollow.FeedName)
 	}
