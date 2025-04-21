@@ -73,7 +73,7 @@ const getFeedFollowsForUser = `-- name: GetFeedFollowsForUser :many
 SELECT ff.id, ff.created_at, ff.updated_at, ff.user_id, ff.feed_id, f.name as feed_name
 FROM feed_follows ff
 INNER JOIN feeds f ON ff.feed_id = f.id
-INNER JOIN users u ON ff.user_id = (SELECT id FROM users WHERE users.name = $1)
+WHERE ff.user_id = (SELECT id FROM users WHERE users.name = $1)
 `
 
 type GetFeedFollowsForUserRow struct {
