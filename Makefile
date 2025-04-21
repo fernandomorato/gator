@@ -8,3 +8,9 @@ down:
 
 reset:
 	make down && make up
+
+gen:
+	sqlc generate
+
+format:
+	gofmt -l -w .
