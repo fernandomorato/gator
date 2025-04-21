@@ -36,14 +36,6 @@ func handlerRegister(s *state, cmd command) error {
 	}
 	username := cmd.Args[0]
 
-	_, err := s.db.GetUser(context.Background(), username)
-	if err == nil {
-		return fmt.Errorf("user %s already exists", username)
-	} else {
-		log.Printf("while searching for user %s got: %v", username, err)
-		log.Printf("let's create it then")
-	}
-
 	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
 		ID: uuid.New(),
 		Name: username,

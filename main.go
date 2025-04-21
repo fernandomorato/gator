@@ -26,6 +26,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error connecting to the database: %v", err)
 	}
+	defer db.Close()
 	dbQueries := database.New(db)
 
 	programState := state{

@@ -5,3 +5,6 @@ up:
 
 down:
 	cd sql/schema && goose postgres "$(DB_URL)" down
+
+reset:
+	make down && make up
