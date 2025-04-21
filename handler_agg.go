@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fernandomorato/gator/internal/database"
 	"github.com/fernandomorato/gator/rss"
+	"github.com/google/uuid"
 )
 
 func handlerAgg(s *state, cmd command) error {
@@ -41,5 +43,29 @@ func scrapeFeeds(s *state) error {
 	for _, item := range feed.Channel.Item {
 		fmt.Printf("- %s\n", item.Title)
 	}
+
+	fmt.Println()
+	fmt.Println("Saving data...")
+	for _, item := range feed.Channel.Item {
+		date, err := time.Parse(time.RFC1123Z, item.PubDate)
+		if err != nil {
+			return fmt.Errorf("error parsing item publication date: %v", err)
+		}
+		_, err = s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			Title:       item.Title,
+			Url:         item.Link,
+			Description: item.Description,
+			PublishedAt: date,
+			FeedID: feedRecord.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("could not create post: %v", err)
+		}
+	}
+	fmt.Println("All data saved!")
+
 	return nil
 }
