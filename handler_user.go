@@ -143,7 +143,7 @@ func handlerUnfollow(s *state, cmd command, user database.User) error {
 
 	err := s.db.DeleteFeedFollow(context.Background(), database.DeleteFeedFollowParams{
 		UserID: user.ID,
-		Url: url,
+		Url:    url,
 	})
 	if err != nil {
 		return fmt.Errorf("error unfollowing feed: %v", err)

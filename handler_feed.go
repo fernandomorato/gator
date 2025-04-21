@@ -7,22 +7,8 @@ import (
 	"time"
 
 	"github.com/fernandomorato/gator/internal/database"
-	"github.com/fernandomorato/gator/rss"
 	"github.com/google/uuid"
 )
-
-func handlerAgg(s *state, cmd command) error {
-	if len(cmd.Args) != 0 {
-		return fmt.Errorf("usage: cli %s", cmd.Name)
-	}
-
-	feed, err := rss.FetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
-	if err != nil {
-		return fmt.Errorf("error fetching feed: %v", err)
-	}
-	fmt.Println(feed)
-	return nil
-}
 
 func handlerAddfeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 2 {
