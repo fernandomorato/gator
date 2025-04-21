@@ -6,13 +6,14 @@ import (
 	"log"
 	"time"
 
-	"github.com/fernandomorato/gator/internal/database"
 	"github.com/google/uuid"
+
+	"github.com/fernandomorato/gator/internal/database"
 )
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Args) != 1 {
-		return fmt.Errorf("usage: %s <name>", cmd.Name)
+		return fmt.Errorf("usage: cli %s <name>", cmd.Name)
 	}
 	username := cmd.Args[0]
 
@@ -32,13 +33,13 @@ func handlerLogin(s *state, cmd command) error {
 
 func handlerRegister(s *state, cmd command) error {
 	if len(cmd.Args) != 1 {
-		return fmt.Errorf("usage: %s <name>", cmd.Name)
+		return fmt.Errorf("usage: cli %s <name>", cmd.Name)
 	}
 	username := cmd.Args[0]
 
 	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
-		ID: uuid.New(),
-		Name: username,
+		ID:        uuid.New(),
+		Name:      username,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
@@ -53,5 +54,18 @@ func handlerRegister(s *state, cmd command) error {
 
 	log.Printf("created user %s successfully!", username)
 	log.Println(user)
+	return nil
+}
+
+func handlerReset(s *state, cmd command) error {
+	if len(cmd.Args) != 0 {
+		return fmt.Errorf("usage: cli %s", cmd.Name)
+	}
+
+	err := s.db.TruncateUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("error deleting users: %v", err)
+	}
+	log.Print("database reset!")
 	return nil
 }
