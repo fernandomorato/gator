@@ -69,3 +69,23 @@ func handlerReset(s *state, cmd command) error {
 	log.Print("database reset!")
 	return nil
 }
+
+func handlerUsers(s *state, cmd command) error {
+	if len(cmd.Args) != 0 {
+		return fmt.Errorf("usage: cli %s", cmd.Name)
+	}
+
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("error getting users: %v", err)
+	}
+
+	for _, user := range users {
+		fmt.Printf("* %s", user.Name)
+		if s.config.CurrentUserName == user.Name {
+			fmt.Printf(" (current)")
+		}
+		fmt.Println()
+	}
+	return nil
+}

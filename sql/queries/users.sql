@@ -13,3 +13,6 @@ SELECT * FROM users WHERE name = $1;
 
 -- name: TruncateUsers :exec
 TRUNCATE users;
+
+-- name: GetUsers :many
+SELECT * FROM users;

@@ -12,7 +12,7 @@ import (
 )
 
 type state struct {
-	db *database.Queries
+	db     *database.Queries
 	config *config.Config
 }
 
@@ -30,7 +30,7 @@ func main() {
 	dbQueries := database.New(db)
 
 	programState := state{
-		db: dbQueries,
+		db:     dbQueries,
 		config: &cfg,
 	}
 
@@ -40,6 +40,7 @@ func main() {
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerUsers)
 
 	args := os.Args
 	if len(args) < 2 {
