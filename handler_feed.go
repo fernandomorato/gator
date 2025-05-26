@@ -12,7 +12,7 @@ import (
 
 func handlerAddfeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 2 {
-		return fmt.Errorf("usage: cli %s <username> <url>", cmd.Name)
+		return fmt.Errorf("usage: cli %s <feedname> <url>", cmd.Name)
 	}
 
 	name := cmd.Args[0]
