@@ -4,5 +4,5 @@ SSM blog aggregator
 
 ## Installation
 ```bash
-go install github.com/fernandomorato/gator
+go install github.com/fernandomorato/gator@latest
 ```
