@@ -8,23 +8,16 @@ package database
 import (
 	"context"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, created_at, updated_at, name)
-VALUES (
-  $1,
-  $2,
-  $3,
-  $4
-)
+VALUES (?, ?, ?, ?)
 RETURNING id, created_at, updated_at, name
 `
 
 type CreateUserParams struct {
-	ID        uuid.UUID
+	ID        interface{}
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
@@ -48,7 +41,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, created_at, updated_at, name FROM users WHERE name = $1
+SELECT id, created_at, updated_at, name FROM users WHERE name = ?
 `
 
 func (q *Queries) GetUser(ctx context.Context, name string) (User, error) {
@@ -64,10 +57,10 @@ func (q *Queries) GetUser(ctx context.Context, name string) (User, error) {
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, created_at, updated_at, name FROM users WHERE id = $1
+SELECT id, created_at, updated_at, name FROM users WHERE id = ?
 `
 
-func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
+func (q *Queries) GetUserById(ctx context.Context, id interface{}) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserById, id)
 	var i User
 	err := row.Scan(
@@ -112,7 +105,7 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 }
 
 const truncateUsers = `-- name: TruncateUsers :exec
-TRUNCATE users CASCADE
+DELETE FROM users
 `
 
 func (q *Queries) TruncateUsers(ctx context.Context) error {

@@ -7,41 +7,39 @@ package database
 import (
 	"database/sql"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Feed struct {
-	ID            uuid.UUID
+	ID            interface{}
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	Name          string
 	Url           string
-	UserID        uuid.UUID
+	UserID        interface{}
 	LastFetchedAt sql.NullTime
 }
 
 type FeedFollow struct {
-	ID        uuid.UUID
+	ID        interface{}
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	UserID    uuid.UUID
-	FeedID    uuid.UUID
+	UserID    interface{}
+	FeedID    interface{}
 }
 
 type Post struct {
-	ID          uuid.UUID
+	ID          interface{}
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Title       string
 	Url         string
 	Description string
 	PublishedAt time.Time
-	FeedID      uuid.UUID
+	FeedID      interface{}
 }
 
 type User struct {
-	ID        uuid.UUID
+	ID        interface{}
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string

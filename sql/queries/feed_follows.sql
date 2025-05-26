@@ -1,26 +1,14 @@
 -- name: CreateFeedFollow :one
-WITH inserted_feed_follow AS (
-  INSERT INTO feed_follows (id, created_at, updated_at, user_id, feed_id)
-  VALUES (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5
-  ) RETURNING *
-)
-
-SELECT ff.*, u.name as user_name, f.name as feed_name
-FROM inserted_feed_follow ff
-INNER JOIN users u ON ff.user_id = u.id
-INNER JOIN feeds f ON ff.feed_id = f.id;
+INSERT INTO feed_follows (id, created_at, updated_at, user_id, feed_id)
+VALUES (?, ?, ?, ?, ?)
+RETURNING *;
 
 -- name: GetFeedFollowsForUser :many
-SELECT ff.*, f.name as feed_name, u.name as user_name
-FROM feed_follows ff
-INNER JOIN feeds f ON ff.feed_id = f.id
-INNER JOIN users u ON ff.user_id = u.id
-WHERE ff.user_id = $1;
+SELECT feed_follows.*, feeds.name as feed_name, users.name as user_name
+FROM feed_follows
+INNER JOIN feeds ON feed_follows.feed_id = feeds.id
+INNER JOIN users ON feed_follows.user_id = users.id
+WHERE feed_follows.user_id = ?;
 
 -- name: DeleteFeedFollow :exec
-DELETE FROM feed_follows ff WHERE ff.user_id = $1 AND ff.feed_id = (SELECT id FROM feeds WHERE url = $2);
+DELETE FROM feed_follows WHERE feed_follows.user_id = ? AND feed_follows.feed_id = (SELECT id FROM feeds WHERE url = ?);

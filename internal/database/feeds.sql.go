@@ -8,30 +8,21 @@ package database
 import (
 	"context"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const createFeed = `-- name: CreateFeed :one
 INSERT INTO feeds (id, created_at, updated_at, name, url, user_id)
-VALUES (
-  $1,
-  $2,
-  $3,
-  $4,
-  $5,
-  $6
-)
+VALUES (?, ?, ?, ?, ?, ?)
 RETURNING id, created_at, updated_at, name, url, user_id, last_fetched_at
 `
 
 type CreateFeedParams struct {
-	ID        uuid.UUID
+	ID        interface{}
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
 	Url       string
-	UserID    uuid.UUID
+	UserID    interface{}
 }
 
 func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, error) {
@@ -57,7 +48,7 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, e
 }
 
 const getFeedByUrl = `-- name: GetFeedByUrl :one
-SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds where url = $1
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds where url = ?
 `
 
 func (q *Queries) GetFeedByUrl(ctx context.Context, url string) (Feed, error) {
@@ -130,10 +121,10 @@ func (q *Queries) GetNextFeedToFetch(ctx context.Context) (Feed, error) {
 }
 
 const markFeedFetched = `-- name: MarkFeedFetched :exec
-UPDATE feeds SET updated_at = NOW(), last_fetched_at = NOW() WHERE id = $1
+UPDATE feeds SET updated_at = NOW(), last_fetched_at = NOW() WHERE id = ?
 `
 
-func (q *Queries) MarkFeedFetched(ctx context.Context, id uuid.UUID) error {
+func (q *Queries) MarkFeedFetched(ctx context.Context, id interface{}) error {
 	_, err := q.db.ExecContext(ctx, markFeedFetched, id)
 	return err
 }

@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/lib/pq"
+	_ "modernc.org/sqlite"
 
 	"github.com/fernandomorato/gator/internal/config"
 	"github.com/fernandomorato/gator/internal/database"
@@ -24,7 +24,7 @@ func main() {
 		log.Fatalf("error reading config: %v", err)
 	}
 
-	db, err := sql.Open("postgres", cfg.DBURL)
+	db, err := sql.Open("sqlite", cfg.DBURL)
 	if err != nil {
 		log.Fatalf("error connecting to the database: %v", err)
 	}

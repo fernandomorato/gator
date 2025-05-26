@@ -8,22 +8,11 @@ package database
 import (
 	"context"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts (id, created_at, updated_at, title, url, description, published_at, feed_id)
-VALUES (
-  $1,
-  $2,
-  $3,
-  $4,
-  $5,
-  $6,
-  $7,
-  $8
-)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT (url) DO UPDATE SET
   updated_at = EXCLUDED.updated_at,
   title = EXCLUDED.title,
@@ -35,14 +24,14 @@ RETURNING id, created_at, updated_at, title, url, description, published_at, fee
 `
 
 type CreatePostParams struct {
-	ID          uuid.UUID
+	ID          interface{}
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Title       string
 	Url         string
 	Description string
 	PublishedAt time.Time
-	FeedID      uuid.UUID
+	FeedID      interface{}
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
@@ -71,14 +60,14 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 }
 
 const getPostsForUser = `-- name: GetPostsForUser :many
-SELECT id, created_at, updated_at, title, url, description, published_at, feed_id FROM posts p WHERE p.feed_id IN (SELECT feed_id FROM feed_follows WHERE user_id = $1)
+SELECT id, created_at, updated_at, title, url, description, published_at, feed_id FROM posts p WHERE p.feed_id IN (SELECT feed_id FROM feed_follows WHERE user_id = ?)
 ORDER BY p.published_at DESC
-LIMIT $2
+LIMIT ?
 `
 
 type GetPostsForUserParams struct {
-	UserID uuid.UUID
-	Limit  int32
+	UserID interface{}
+	Limit  int64
 }
 
 func (q *Queries) GetPostsForUser(ctx context.Context, arg GetPostsForUserParams) ([]Post, error) {

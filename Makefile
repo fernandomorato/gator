@@ -1,10 +1,10 @@
-DB_URL := postgres://postgres:postgres@localhost:5432/gator
+DB_URL = ./.app.db
 
 up:
-	cd sql/schema && goose postgres "$(DB_URL)" up
+	cd sql/schema && goose sqlite3 "$(DB_URL)" up
 
 down:
-	cd sql/schema && goose postgres "$(DB_URL)" down
+	cd sql/schema && goose sqlite "$(DB_URL)" down
 
 reset:
 	make down && make up
